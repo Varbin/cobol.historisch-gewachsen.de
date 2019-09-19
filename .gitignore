@@ -1,0 +1,9 @@
+main
+main.cob
+historisch-gewachsen
+*.[s]o
+www/cgi-bin/historisch-gewachsen.cgi
+
+# Keep cgi-bin/ empty.
+cgi-bin/*
+!cgi-bin/.gitkeep
