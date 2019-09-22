@@ -1,4 +1,4 @@
-This site still written in COBOL.
+This site is written in COBOL.
 COBOL is the language of the future!
 Humans can be replaced, COBOL cannot.
 Company's last COBOL developer died of age.
