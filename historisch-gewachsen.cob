@@ -73,9 +73,9 @@ DATA   DATA DIVISION.
                    03 current-hours        PIC 9(2).
                    03 current-minute       PIC 9(2).
                    03 current-seconds      PIC 9(2).
-                   03 currelt-milliseconds PIC 9(2).
+                   03 current-milliseconds PIC 9(2).
 
-           01 data-rng-seed            PIC 9(16).
+           01 data-rng-seed            PIC 9(18).
 
            01 today-formatted.
                02  formatted-year      PIC 9(4).
