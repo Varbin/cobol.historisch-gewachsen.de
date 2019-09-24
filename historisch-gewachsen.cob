@@ -132,7 +132,7 @@ CODE   PROCEDURE DIVISION.
            STRING
                "#" chosen-line 
                INTO display-row END-STRING
-           display display-row
+           DISPLAY display-row
 
            DISPLAY quote-line(1:(80 - trailing-spaces))
 
