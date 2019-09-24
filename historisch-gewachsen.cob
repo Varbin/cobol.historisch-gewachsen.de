@@ -158,7 +158,7 @@ CODE   PROCEDURE DIVISION.
            END-CALL
        
            IF cgi-enabled THEN
-               DISPLAY "Via: COBOL" NEWLINE
+               DISPLAY "X-Powered-By: COBOL" NEWLINE
                IF request-method = "HEAD" THEN
                    GOBACK
                END-IF
