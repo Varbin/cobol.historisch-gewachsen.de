@@ -49,16 +49,10 @@ DATA   DATA DIVISION.
 
       *>   The line to print (0-indexed)
            01 chosen-line              PIC 999.
-           01 chosen-line-repr         PIC **9.
 
       *>   Check for EOF when determining lines in quotes file.
            01 file-status              PIC X.
                88 file-eof                         VALUE HIGH-VALUES.
-
-      *>   struct timeval of sys/time.h
-           01 timestamp-struct.
-               02 timestamp-seconds        PIC X(4)    COMP-5.
-               02 timestamp-microseconds   PIC X(4)    COMP-5.
 
            01 cgi-status               PIC X(1)    VALUE "N".
                88 cgi-enabled                      VALUE "Y".
@@ -83,7 +77,7 @@ DATA   DATA DIVISION.
                02  formatted-month     PIC 9(2).
                02  filler              PIC X(1)    VALUE "-".
                02  formatted-day       PIC 9(2).
-               
+
            01 display-row              PIC x(80).
 
 CODE   PROCEDURE DIVISION.
@@ -98,7 +92,7 @@ CODE   PROCEDURE DIVISION.
            IF cgi-enabled
                CALL "HTMLSTART" END-CALL
            END-IF
-           
+
            MOVE "=== REPORT OF cobol.historisch-gewachsen.de ===" TO 
                display-row
            DISPLAY display-row
@@ -188,7 +182,6 @@ CODE   PROCEDURE DIVISION.
                chosen-line =
                    (line-count - 1) * FUNCTION RANDOM(data-rng-seed)
            END-COMPUTE
-           MOVE chosen-line TO chosen-line-repr.
     
            SET line-count TO 0
     
