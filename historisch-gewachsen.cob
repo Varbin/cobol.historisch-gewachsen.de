@@ -81,8 +81,6 @@ DATA   DATA DIVISION.
            01 display-row              PIC x(80).
 
 CODE   PROCEDURE DIVISION.
-       DECLARATIVES.
-       END DECLARATIVES.
 
        MAIN-LINE SECTION.
            PERFORM SETUP-TIME
