@@ -9,7 +9,7 @@ INIT  *> It will reject all POST requests.
       *> Enterprise COBOL for z/OS version 4.2 Programming Guide,
       *> chapter 23:
       *>  "Example: setting and accessing environment variables" 
-
+       IDENTIFICATION DIVISION.
        PROGRAM-ID.    CGIHEADER.
 
        DATA DIVISION.
