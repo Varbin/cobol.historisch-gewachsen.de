@@ -32,9 +32,9 @@ INIT  *> It will reject all POST requests.
 
        PROCEDURE DIVISION USING 
            cgi-status restrict-methods content-type request-method.
-    
+
        CGIHEADER.
-       
+
       *>   Get HTTP request type.
       *>   It will only be set, if running as CGI.
        CALL "getenv" USING
@@ -48,7 +48,7 @@ INIT  *> It will reject all POST requests.
            GOBACK
        END-IF
        MOVE "Y" TO cgi-status
-       
+
       *>   Resolve pointer and get request method. 
        SET ADDRESS OF temp-method-var TO request-method-ptr
 
@@ -70,9 +70,9 @@ INIT  *> It will reject all POST requests.
            DISPLAY "INVALID REQUEST METHOD:" SPACE request-method
            STOP RUN
        END-IF
-       
+
        DISPLAY "Content-Type:" SPACE content-type
        GOBACK
        .
-        
+
        END PROGRAM CGIHEADER.
