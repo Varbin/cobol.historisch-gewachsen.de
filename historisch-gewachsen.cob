@@ -37,13 +37,6 @@ DATA   DATA DIVISION.
            01 request-method-var       PIC X(20) 
                VALUE Z"REQUEST_METHOD".
 
-           01 request-invalid          PIC X.
-               88 invalid-method                   VALUE HIGH-VALUES.
-      *>   Note: The final result is stored in the LINKAGE SECTION.
-
-      *>   To remove spaces of output string
-           01 trailing-spaces          PIC 9(2).
-
       *>   Current line in file.
            01 line-count               PIC 9(3)    VALUE 0.
 
@@ -54,10 +47,12 @@ DATA   DATA DIVISION.
            01 file-status              PIC X.
                88 file-eof                         VALUE HIGH-VALUES.
 
+      *>   Wether the program runs as CGI or not.
            01 cgi-status               PIC X(1)    VALUE "N".
                88 cgi-enabled                      VALUE "Y".
                88 cgi-disabled                     VALUE "N".
 
+      *>   Structure for CURRENT-DATE
            01 current-date-data.
                02 current-date.
                    03 current-year         PIC 9(4).
@@ -69,8 +64,10 @@ DATA   DATA DIVISION.
                    03 current-seconds      PIC 9(2).
                    03 current-milliseconds PIC 9(2).
 
+      *>   Numeric variable for RNG seed, based on the current date
            01 data-rng-seed            PIC 9(18).
 
+      *>   Format date in ISO format
            01 today-formatted.
                02  formatted-year      PIC 9(4).
                02  filler              PIC X(1)    VALUE "-".
@@ -78,64 +75,21 @@ DATA   DATA DIVISION.
                02  filler              PIC X(1)    VALUE "-".
                02  formatted-day       PIC 9(2).
 
+      *>   Temporary variable to output
            01 display-row              PIC x(80).
 
 CODE   PROCEDURE DIVISION.
 
-       MAIN-LINE SECTION.
-           PERFORM SETUP-TIME
-           PERFORM CGI-CHECK
-           PERFORM GET-QUOTE
+       0000-MAIN SECTION.
+           PERFORM 1000-SETUP-TIME
+           PERFORM 2000-CGI-CHECK
+           PERFORM 3000-GET-QUOTE
 
            IF cgi-enabled
                CALL "HTMLSTART" END-CALL
            END-IF
 
-           MOVE "=== REPORT OF cobol.historisch-gewachsen.de ===" TO 
-               display-row
-           DISPLAY display-row
-
-           MOVE " " TO display-row
-           STRING
-               "Date:       " today-formatted
-               INTO display-row
-           END-STRING
-           DISPLAY display-row
-
-           MOVE " " TO display-row
-           STRING
-               "Web-CGI:    " cgi-status
-               INTO display-row
-           END-STRING
-           DISPLAY display-row
-
-           MOVE " " TO display-row
-           DISPLAY display-row
-
-           MOVE "-- PROBLEM" TO display-row
-           DISPLAY display-row
-           STRING 
-               "Project has historically grown, " 
-               "it is still written in COBOL."
-               INTO  display-row
-           END-STRING
-           DISPLAY display-row
-
-           MOVE " " TO display-row
-           DISPLAY display-row
-
-           MOVE "-- REASON" TO display-row
-           DISPLAY display-row
-           MOVE " " TO display-row
-           STRING
-               "#" chosen-line 
-               INTO display-row END-STRING
-           DISPLAY display-row
-
-           DISPLAY quote-line(1:(80 - trailing-spaces))
-
-           MOVE " " TO display-row
-           DISPLAY display-row
+           PERFORM 4000-DISPLAY-OUTPUT.
 
            IF cgi-enabled
                CALL "HTMLSTOP" END-CALL
@@ -143,7 +97,23 @@ CODE   PROCEDURE DIVISION.
 
            STOP RUN.
 
-       CGI-CHECK SECTION.
+       *> Fill 'current-date-data' with the current date and time,
+       *> set the RNG seed and fill 'today-formatted' with today's date.
+       *>
+       *> CALLED BY: 0000-MAIN.
+       1000-SETUP-TIME SECTION.
+              MOVE FUNCTION CURRENT-DATE   TO current-date-data
+              MOVE current-date-data       TO data-rng-seed
+              MOVE current-year            TO formatted-year
+              MOVE current-month           TO formatted-month
+              MOVE current-day             TO formatted-day
+       .
+
+      *> Check if the program runs as CGI and print HTTP headers
+      *> if it does.
+      *> 
+      *> CALLED BY: 0000-MAIN.
+       2000-CGI-CHECK SECTION.
            CALL "CGIHEADER" USING
       *>       cgi-status         
                by reference cgi-status
@@ -161,9 +131,13 @@ CODE   PROCEDURE DIVISION.
                    GOBACK
                END-IF
            END-IF
-           .
+       .
     
-       GET-QUOTE SECTION.
+      *> Seek the 'QuoteDb' to a random line,
+      *> making 'quote-line' a random quote.
+      *> 
+      *> CALLED BY: 0000-MAIN.
+       3000-GET-QUOTE SECTION.
       *>   Get Linecount
            OPEN INPUT QuoteDb
            PERFORM UNTIL file-eof
@@ -190,15 +164,74 @@ CODE   PROCEDURE DIVISION.
                ADD 1 TO line-count END-ADD
            END-PERFORM
            CLOSE QuoteDb
-           .
-
-       SETUP-TIME SECTION.
-              MOVE FUNCTION CURRENT-DATE TO current-date-data
-              MOVE current-date-data TO data-rng-seed
-              MOVE current-year TO formatted-year
-              MOVE current-month TO formatted-month
-              MOVE current-day TO formatted-day
        .
+
+      *> 4000-DISPLAY-OUTPUT
+      *> Displays some text, the current date and the chosen quote.
+      *> All output has a fixed width of 80 characters.
+      *>
+      *> CALLED BY: 0000-MAIN.
+      *> CALLS: CLEAR-ROW.
+       4000-DISPLAY-OUTPUT SECTION.
+           MOVE "=== REPORT OF cobol.historisch-gewachsen.de ===" 
+                               TO display-row
+           DISPLAY display-row  
+
+           PERFORM CLEAR-ROW
+           STRING
+               "Date:       " today-formatted
+                               INTO display-row
+           END-STRING
+           DISPLAY display-row
+
+           PERFORM CLEAR-ROW
+           STRING
+               "Web-CGI:    " cgi-status
+                               INTO display-row
+           END-STRING
+           DISPLAY display-row
+
+           PERFORM CLEAR-ROW
+           DISPLAY display-row
+
+           MOVE "-- PROBLEM"   TO display-row
+           DISPLAY display-row
+
+           STRING 
+               "Project has historically grown, " 
+               "it is still written in COBOL."
+                               INTO  display-row
+           END-STRING
+           DISPLAY display-row
+
+           PERFORM CLEAR-ROW
+           DISPLAY display-row
+
+           MOVE "-- REASON"    TO display-row
+           DISPLAY display-row
+
+           PERFORM CLEAR-ROW
+           STRING
+               "#" chosen-line 
+                               INTO display-row 
+           END-STRING
+           DISPLAY display-row
+
+      *>   Finally print the quote, prepared by '3000-GET-QUOTE'
+           DISPLAY quote-line
+
+      *>   Empty line with an 80 character width 
+           PERFORM CLEAR-ROW
+           DISPLAY display-row
+       .
+
+      *> Clear 'display-row' with spaces.
+      *>
+      *> CALLED BY: 4000-DISPLAY-OUTPUT
+       CLEAR-ROW.
+           MOVE " "    TO display-row
+       .
+            
 
        END PROGRAM historisch-gewachsen.
 
