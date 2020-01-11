@@ -65,7 +65,7 @@ DATA   DATA DIVISION.
                    03 current-milliseconds PIC 9(2).
 
       *>   Numeric variable for RNG seed, based on the current date
-           01 data-rng-seed            PIC 9(18).
+           01 data-rng-seed            PIC 9(16).
 
       *>   Format date in ISO format
            01 today-formatted.
